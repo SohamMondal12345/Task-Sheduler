@@ -1,0 +1,140 @@
+/* Dashboard.css */
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background: linear-gradient(to right, #74ebd5, #9face6);
+  color: #333;
+}
+
+.dashboard-container {
+  padding: 40px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.logout-btn {
+  padding: 10px 20px;
+  background-color: #ff5e5e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #e54848;
+}
+
+.weather-box {
+  background: #ffffffdd;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.weather-box.small {
+  display: inline-block;
+  width: 220px;
+  margin: 10px;
+}
+
+.extra-city-section {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.city-input {
+  padding: 10px;
+  font-size: 1rem;
+  width: 250px;
+  margin-right: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.search-btn {
+  padding: 10px 20px;
+  background-color: #4e54c8;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-btn:hover {
+  background-color: #3d40a1;
+}
+
+.multi-weather {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.form-section {
+  margin-top: 40px;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+}
+
+.schedule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.schedule-form input,
+.schedule-form select {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.submit-btn {
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+.dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.info-box {
+  background: #f3f3f3;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+}
+
+.info-box p {
+  margin: 10px 0;
+  font-size: 16px;
+}
