@@ -1,70 +1,127 @@
-/* Signup.css */
-
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(to right, #ff758c, #ff7eb3);
+/* Background with blur and dark overlay */
+.signup-page::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -2;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.5), rgba(30, 30, 30, 0.4)),
+              url("https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1920&q=80") center/cover no-repeat;
+  filter: blur(10px);
+  transform: scale(1.05);
+  animation: bgZoom 30s ease-in-out infinite alternate;
+  opacity: 1;
 }
 
+@keyframes bgZoom {
+  0% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+/* Container */
 .signup-page {
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 20px;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+  position: relative;
+  padding: 2rem;
 }
 
+/* Form Box */
 .signup-container {
-  background: #ffffffee;
-  padding: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  padding: 3rem 2.5rem;
+  max-width: 450px;
   width: 100%;
-  text-align: center;
+  color: #ffffff;
+  animation: fadeIn 1s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Title */
 .signup-title {
-  font-size: 2rem;
-  margin-bottom: 25px;
-  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #ffffff;
 }
 
+/* Form */
 .signup-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1rem;
 }
 
 .input-field {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+  padding: 0.8rem;
   font-size: 1rem;
-}
-
-.signup-btn {
-  padding: 12px;
-  background-color: #ff758c;
-  color: white;
-  font-weight: bold;
   border: none;
   border-radius: 10px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.input-field::placeholder {
+  color: #e0e0e0;
+}
+
+/* Dropdown field style */
+.input-field option {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Submit Button */
+.signup-btn {
+  background-color: #4facfe;
+  background-image: linear-gradient(to right, #43e97b, #38f9d7);
+  border: none;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: bold;
   transition: background 0.3s ease;
 }
 
 .signup-btn:hover {
-  background-color: #e5486b;
+  background-image: linear-gradient(to right, #38f9d7, #43e97b);
 }
 
+/* Footer Text */
 .signup-footer {
-  margin-top: 20px;
-  color: #444;
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #e2e8f0;
 }
 
 .signup-footer a {
-  color: #ff5e7b;
-  font-weight: 600;
+  color: #63b3ed;
   text-decoration: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
