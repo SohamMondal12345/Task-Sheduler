@@ -92,10 +92,8 @@ const Dashboard = () => {
 
         <div className="info-box">
           <p><strong>Email:</strong> {userData.email}</p>
-          <p><strong>Password:</strong> {userData.password}</p>
           <p><strong>City:</strong> {userData.city}</p>
           <p><strong>Frequency:</strong> {userData.frequency}</p>
-          <p><strong>Time:</strong> {userData.time}</p>
           <p><strong>Subscribed:</strong> {userData.subscribed ? "Yes ✅" : "No ❌"}</p>
 
           {userData.subscribed ? (

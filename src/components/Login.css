@@ -7,8 +7,10 @@
   z-index: -2;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.5), rgba(30, 30, 30, 0.4)),
-              url("https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=1920&q=80") center/cover no-repeat;
+background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.5), rgba(30, 30, 30, 0.4)),
+            url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80") center/cover no-repeat;
+filter: blur(10px);
+
   filter: blur(10px);
   transform: scale(1.05);
   animation: bgZoom 25s ease-in-out infinite alternate;
