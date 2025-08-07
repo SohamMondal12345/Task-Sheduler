@@ -125,3 +125,80 @@
     transform: translateY(0);
   }
 }
+/* Flex wrapper for form and info box */
+.signup-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  max-width: 1000px;
+  width: 100%;
+}
+
+.signup-info-box {
+  background: linear-gradient(135deg, rgba(72, 61, 139, 0.2), rgba(0, 255, 255, 0.15));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  HEIGHT:200PX;
+  max-width: 350px;
+  width: 100%;
+  color: #ffffff;
+  animation: fadeIn 1.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative gradient ring */
+.signup-info-box::before {
+  content: "";
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, #38f9d7, transparent);
+  border-radius: 50%;
+  opacity: 0.6;
+  z-index: 0;
+}
+
+.signup-info-box h3 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #7fffd4;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.signup-info-box h3::before {
+  content: "📬";
+  font-size: 1.5rem;
+}
+
+.signup-info-box p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #e0ffff;
+  position: relative;
+  z-index: 1;
+}
+.signup-info-box {
+  /* previous styles... */
+  animation: pulseGlow 6s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6), 0 0 60px rgba(0, 255, 255, 0.3);
+  }
+}

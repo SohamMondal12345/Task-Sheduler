@@ -28,9 +28,17 @@ const Signup = () => {
       alert('Signup failed');
     }
   };
-
-  return (
-    <div className="signup-page">
+return (
+  <div className="signup-page">
+    <div className="signup-wrapper">
+      <div className="signup-info-box">
+        <h3>📧 Confirmation Required</h3>
+        <p>
+          After signing up, you will receive a confirmation email.
+          Please check your inbox and verify your email to start
+          receiving weather alerts.
+        </p>
+      </div>
       <div className="signup-container">
         <h2 className="signup-title">📝 Sign Up for Weather Alerts</h2>
         <form onSubmit={handleSignup} className="signup-form">
@@ -80,8 +88,11 @@ const Signup = () => {
           Already have an account? <a href="/login">Login</a>
         </p>
       </div>
+
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Signup;
