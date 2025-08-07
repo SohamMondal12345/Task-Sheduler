@@ -15,7 +15,39 @@ const db = new DynamoDBClient({ region: "eu-north-1" });
 
 const WEATHER_API = "https://api.weatherapi.com/v1/current.json";
 const WEATHER_API_KEY = "7aacc04ea876416f8d7170130250108";
-const SOURCE_EMAIL = "sohammondal12345@gmail.com"; // Must be verified in SES
+const SOURCE_EMAIL = "sohammondal12345@gmail.com"; // Verified email
+
+// Helper to get IST-equivalent time from UTC
+function getTimeInTimezone(timezone) {
+  try {
+    const utcDate = new Date();
+
+    const timeString = utcDate.toLocaleTimeString("en-US", {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    const dateString = utcDate.toLocaleDateString("en-CA", {
+      timeZone: timezone,
+    }); // yyyy-mm-dd
+
+    return {
+      time: timeString,       // "HH:mm"
+      date: dateString,       // "YYYY-MM-DD"
+    };
+  } catch (err) {
+    console.warn(`⚠️ Failed to resolve timezone: ${timezone}, defaulting to UTC`);
+    const now = new Date();
+    const hh = now.getUTCHours().toString().padStart(2, "0");
+    const mm = now.getUTCMinutes().toString().padStart(2, "0");
+    return {
+      time: `${hh}:${mm}`,
+      date: now.toISOString().split("T")[0],
+    };
+  }
+}
 
 export const handler = async () => {
   try {
@@ -37,11 +69,17 @@ export const handler = async () => {
       };
     }
 
-    let verifiedCount = 0, verificationSent = 0, pendingCount = 0;
+    let verifiedCount = 0,
+      verificationSent = 0,
+      pendingCount = 0,
+      skippedTime = 0;
 
     for (const user of users) {
       const email = user.email?.S;
       const city = user.city?.S || "Kolkata";
+      const preferredTime = user.time?.S || "08:00"; // Default 8 AM
+      const timezone = user.timezone?.S || "Asia/Kolkata"; // Default timezone
+
       if (!email) continue;
 
       const verificationSentFlag = user.verification_sent?.BOOL || false;
@@ -50,14 +88,28 @@ export const handler = async () => {
         new GetIdentityVerificationAttributesCommand({ Identities: [email] })
       );
 
-      const status = verifyStatus.VerificationAttributes?.[email]?.VerificationStatus;
+      const status =
+        verifyStatus.VerificationAttributes?.[email]?.VerificationStatus;
 
       if (status === "Success") {
-        // 🔄 Fetch personalized weather
-        const weatherRes = await fetch(`${WEATHER_API}?key=${WEATHER_API_KEY}&q=${city}`);
+        // ✅ Time check (native)
+        const { time: currentTimeStr, date: currentDate } = getTimeInTimezone(timezone);
+
+        if (currentTimeStr !== preferredTime) {
+          console.log(
+            `⏳ Skipping ${email} — Not preferred time: now=${currentTimeStr}, preferred=${preferredTime}`
+          );
+          skippedTime++;
+          continue;
+        }
+
+        // ✅ Fetch weather
+        const weatherRes = await fetch(
+          `${WEATHER_API}?key=${WEATHER_API_KEY}&q=${city}`
+        );
         const weather = await weatherRes.json();
 
-        const subject = `🌦️ Weather Update for ${city} - ${new Date().toLocaleDateString()}`;
+        const subject = `🌦️ Weather Update for ${city} - ${currentDate}`;
         const iconUrl = `https:${weather.current.condition.icon}`;
         const htmlBody = `
         <html>
@@ -70,7 +122,7 @@ export const handler = async () => {
                 <div>
                   <h3 style="margin: 0;">${weather.current.condition.text}</h3>
                   <p style="margin: 5px 0;">📍 ${weather.location.name}, ${weather.location.country}</p>
-                  <p style="margin: 5px 0;">📅 ${new Date().toLocaleDateString()}</p>
+                  <p style="margin: 5px 0;">📅 ${currentDate}</p>
                 </div>
               </div>
               <hr />
@@ -134,7 +186,7 @@ export const handler = async () => {
 
     return {
       statusCode: 200,
-      body: `✅ Sent to ${verifiedCount}. 📩 Verifications: ${verificationSent}. ⏳ Pending: ${pendingCount}`,
+      body: `✅ Sent: ${verifiedCount}, 📩 Verifications: ${verificationSent}, ⏳ Pending: ${pendingCount}, ⏰ Skipped (wrong time): ${skippedTime}`,
     };
   } catch (err) {
     console.error("❌ Error:", err);

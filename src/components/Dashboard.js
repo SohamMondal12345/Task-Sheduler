@@ -116,8 +116,8 @@ return (
           <p>{userData.city}</p>
         </div>
         <div className="card fade-in">
-          <h3>⏰ Frequency</h3>
-          <p>{userData.frequency}</p>
+          <h3>⏰ Time</h3>
+          <p>{userData.time}</p>
         </div>
         <div className="card fade-in">
           <h3>📬 Subscription</h3>
