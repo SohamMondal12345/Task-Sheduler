@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weather Wallpapers Preview</title>
+  <style>
+    :root{
+      --card-radius:14px;
+      --text: #ffffff;
+    }
+    html,body{ height:100%; margin:0; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:#071126; color:var(--text); }
+
+    /* Background layer that will change */
+    #bg-layer{
+      position:fixed; inset:0; background-size:cover; background-position:center; background-repeat:no-repeat;
+      filter:brightness(0.55) contrast(1.02);
+      z-index:0; transition:opacity .8s ease, background-image .9s ease;
+    }
+    /* Temporary crossfade layer */
+    .tmp-bg{ position:fixed; inset:0; background-size:cover; background-position:center; z-index:1; opacity:0;
+      transition:opacity .9s ease; filter:brightness(0.6) contrast(1.02); pointer-events:none; }
+
+    /* Page content */
+    .app{ position:relative; z-index:2; min-height:100vh; display:flex; flex-direction:column; gap:20px; padding:28px; box-sizing:border-box; }
+    header{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px; border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); box-shadow:0 6px 30px rgba(2,6,23,0.6); }
+    header h1{ margin:0; font-size:20px; display:flex; gap:10px; align-items:center; }
+    .controls{ display:flex; gap:10px; align-items:center; }
+    .btn{ background:rgba(255,255,255,0.08); color:var(--text); border:none; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600; }
+    .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.06); }
+
+    main{ display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:18px; align-items:start; }
+
+    .card{ position:relative; height:160px; border-radius:var(--card-radius); overflow:hidden; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-end;
+      background:linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.38)); box-shadow: 0 10px 30px rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.04); transition: transform .22s ease, box-shadow .22s ease; }
+    .card:hover{ transform: translateY(-6px) scale(1.01); box-shadow: 0 18px 48px rgba(2,6,23,0.7); }
+    .card .img{ position:absolute; inset:0; background-size:cover; background-position:center; filter: saturate(.98) contrast(1.02); transform: scale(1.04); }
+    .card .label{ position:relative; z-index:2; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:8px; color:var(--text); }
+    .label h3{ margin:0; font-size:16px; text-shadow:0 3px 10px rgba(0,0,0,0.6); }
+    .label small{ opacity:0.95; font-weight:600; font-size:12px; background: rgba(0,0,0,0.35); padding:6px 8px; border-radius:8px; cursor:pointer; }
+
+    footer{ margin-top:10px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .note{ font-size:13px; opacity:0.95; color: #dbeafe; }
+
+    /* modal */
+    .modal{ position:fixed; inset:0; display:none; place-items:center; z-index:9999; }
+    .modal.open{ display:grid; }
+    .modal .box{ width:min(980px,92%); height:min(600px,86vh); border-radius:14px; overflow:hidden; position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.06); box-shadow:0 40px 120px rgba(2,6,23,0.85); }
+    .modal .box .preview{ position:absolute; inset:0; background-size:cover; background-position:center; filter:brightness(.9) saturate(.98); }
+    .modal .box .meta{ position:absolute; bottom:18px; left:18px; z-index:3; color:var(--text); text-shadow:0 6px 22px rgba(0,0,0,0.6); display:flex; gap:12px; align-items:center; }
+
+    @media (max-width:640px){ .card{ height:140px; } header{ flex-direction:column; align-items:stretch; gap:8px; } .controls{ justify-content:flex-end; } }
+  </style>
+</head>
+<body>
+
+  <div id="bg-layer"></div>
+
+  <div class="app">
+    <header>
+      <h1>🌤️ Weather Wallpapers — Preview</h1>
+      <div class="controls">
+        <button class="btn" id="resetBtn">Reset background</button>
+        <button class="btn ghost" id="showAllBtn">Show all in full</button>
+      </div>
+    </header>
+
+    <main id="grid"></main>
+
+    <footer>
+      <div class="note">Click a card to set as background. Click "Preview" to open a larger view and use it as the background.</div>
+    </footer>
+  </div>
+
+  <!-- preview modal -->
+  <div class="modal" id="modal">
+    <div class="box">
+      <div class="preview" id="modalPreview"></div>
+      <div class="meta">
+        <div style="display:flex;flex-direction:column;">
+          <strong id="modalTitle" style="font-size:18px;"></strong>
+          <small id="modalUrl" style="opacity:.88"></small>
+        </div>
+        <div style="margin-left:12px;">
+          <button class="btn" id="useAsBgBtn">Use as background</button>
+          <button class="btn ghost" id="closeModal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Curated direct Unsplash image URLs (nature images)
+const weatherWallpapers = {
+  Sunny: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80", 
+  Clear: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1920&q=80",
+  Rain: "https://images.unsplash.com/photo-1444384851176-6e23071c6127?auto=format&fit=crop&w=1920&q=80",
+  Thunderstorm: "https://images.unsplash.com/photo-1562155618-e1a8bc2eb04f?q=80&w=1920&auto=format&fit=crop",
+  Cloud: "https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=1920&q=80",
+  Snow: "https://plus.unsplash.com/premium_photo-1670430004754-60d86c50fb81?q=80&w=1920&auto=format&fit=crop", // updated
+  Mist: "https://images.unsplash.com/photo-1447014421976-7fec21d26d86?w=1920&auto=format&fit=crop&q=80", // updated
+  Haze: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80",
+  Drizzle: "https://images.unsplash.com/photo-1527766833261-b09c3163a791?auto=format&fit=crop&w=1920&q=80",
+  Default: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80"
+};
+
+
+    const grid = document.getElementById('grid');
+    const bgLayer = document.getElementById('bg-layer');
+    const modal = document.getElementById('modal');
+    const modalPreview = document.getElementById('modalPreview');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalUrl = document.getElementById('modalUrl');
+    const useAsBgBtn = document.getElementById('useAsBgBtn');
+    const closeModal = document.getElementById('closeModal');
+    const resetBtn = document.getElementById('resetBtn');
+    const showAllBtn = document.getElementById('showAllBtn');
+
+    // Populate cards
+    Object.entries(weatherWallpapers).forEach(([key, url])=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.title = `Set "${key}" as background`;
+
+      const img = document.createElement('div');
+      img.className = 'img';
+      img.style.backgroundImage = `url("${url}")`;
+
+      const label = document.createElement('div');
+      label.className = 'label';
+
+      const h3 = document.createElement('h3');
+      h3.textContent = key;
+
+      const small = document.createElement('small');
+      small.textContent = 'Preview';
+      small.onclick = (e)=>{
+        e.stopPropagation();
+        openModal(key, url);
+      };
+
+      label.appendChild(h3);
+      label.appendChild(small);
+
+      card.appendChild(img);
+      card.appendChild(label);
+
+      card.onclick = () => setBackground(url);
+      grid.appendChild(card);
+    });
+
+    // Modal handlers
+    function openModal(name, url){
+      modal.classList.add('open');
+      modalPreview.style.backgroundImage = `url("${url}")`;
+      modalTitle.textContent = name;
+      modalUrl.textContent = url;
+      useAsBgBtn.onclick = ()=> { setBackground(url); modal.classList.remove('open'); };
+    }
+    closeModal.onclick = ()=> modal.classList.remove('open');
+    modal.onclick = (e)=> { if(e.target === modal) modal.classList.remove('open'); };
+
+    // Crossfade background helper
+    let currentBg = '';
+    function setBackground(url){
+      if(!url) return;
+      if(currentBg === url) return;
+      // create temp
+      const tmp = document.createElement('div');
+      tmp.className = 'tmp-bg';
+      tmp.style.backgroundImage = `url("${url}")`;
+      document.body.appendChild(tmp);
+      // force paint then fade in
+      requestAnimationFrame(()=> { tmp.style.opacity = '1'; });
+      // after fade, set bg-layer image and remove tmp
+      setTimeout(()=>{
+        bgLayer.style.backgroundImage = `url("${url}")`;
+        bgLayer.style.background = ''; // clear any gradient fallback
+        // remove tmp shortly after
+        setTimeout(()=> tmp.remove(), 120);
+        currentBg = url;
+      }, 920);
+    }
+
+    // Reset to fallback gradient
+    resetBtn.onclick = ()=>{
+      currentBg = '';
+      bgLayer.style.backgroundImage = '';
+      bgLayer.style.background = 'linear-gradient(135deg,#071126 0%, #04202f 100%)';
+    };
+
+    // "Show all" quick carousel
+    showAllBtn.onclick = async ()=>{
+      const entries = Object.entries(weatherWallpapers);
+      for (let i=0;i<entries.length;i++){
+        const [k,u] = entries[i];
+        openModal(k,u);
+        const closed = await waitForModalCloseOrTimeout(900);
+        if(closed) break;
+      }
+    };
+    function waitForModalCloseOrTimeout(ms){
+      return new Promise(resolve => {
+        let resolved=false;
+        const onClose = ()=>{ if(!resolved){ resolved=true; resolve(true); } };
+        closeModal.addEventListener('click', onClose, {once:true});
+        modal.addEventListener('click', (e)=>{ if(e.target===modal && !resolved){ resolved=true; resolve(true);} }, {once:true});
+        setTimeout(()=> { if(!resolved){ resolved=true; resolve(false);} }, ms);
+      });
+    }
+
+    // Preload images (non-blocking)
+    Object.values(weatherWallpapers).forEach(src=> { const i = new Image(); i.src = src; });
+
+    // initial: use Default
+    if(weatherWallpapers.Default) {
+      bgLayer.style.backgroundImage = `url("${weatherWallpapers.Default}")`;
+      bgLayer.style.backgroundSize = 'cover';
+    }
+  </script>
+</body>
+</html>
