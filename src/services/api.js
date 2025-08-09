@@ -87,3 +87,22 @@ export async function saveSubscription(data) {
 
   return res.json();
 }
+
+const UPDATE_USER_DETAILS_API = "https://2ncjy89z0d.execute-api.eu-north-1.amazonaws.com/default/update-user-details";
+
+export async function updateUserDetails(data) {
+  const res = await fetch(UPDATE_USER_DETAILS_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to update user details");
+  }
+
+  return res.json();
+}

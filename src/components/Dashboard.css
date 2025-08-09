@@ -219,3 +219,62 @@ button:hover {
 .card:nth-child(5) {
   animation-delay: 0.5s;
 }
+
+/* Container for city/time update section */
+.info-box {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin: 30px auto;
+  max-width: 400px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Heading text */
+.info-box .info-heading {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+/* Input fields for city & time */
+.info-box input[type="text"],
+.info-box input[type="time"] {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.85);
+  transition: 0.3s ease;
+}
+
+.info-box input[type="text"]:focus,
+.info-box input[type="time"]:focus {
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0, 150, 255, 0.6);
+}
+
+/* Save button */
+.info-box button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #4cafef, #1e90ff);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.info-box button:hover {
+  background: linear-gradient(135deg, #1e90ff, #4cafef);
+  transform: scale(1.05);
+}
