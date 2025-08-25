@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import {
   getWeather as getCurrentWeather,
   getCurrentWeatherWithAQI as getAirQuality,
-  updateUserDetails
-} from '../services/api';
+  updateUserDetails,
+  unsubscribe,
+  saveSubscription
+} from "../services/api";
 import './Dashboard.css';
+
 const weatherWallpapers = {
   Sunny: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80",
   Clear: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1920&q=80",
@@ -18,7 +21,6 @@ const weatherWallpapers = {
   Drizzle: "https://images.unsplash.com/photo-1527766833261-b09c3163a791?auto=format&fit=crop&w=1920&q=80",
   Default: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80"
 };
-
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -93,9 +95,70 @@ const Dashboard = () => {
     }
   };
 
-  const handleStopSubscription = async () => { /* same as before */ };
-  const handleResubscribe = async () => { /* same as before */ };
-  const handleLogout = () => { /* same as before */ };
+  // ✅ FIXED Handlers
+  
+  const handleStopSubscription = async () => {
+    if (!userData?.email) return;
+
+    try {
+      setLoading(true);
+      const res = await fetch('https://3y99jmtnnk.execute-api.eu-north-1.amazonaws.com/default/stop-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userData.email }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Subscription stopped.");
+        const updatedUser = { ...userData, subscribed: false };
+        setUserData(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } else {
+        alert(data.message || "Failed to update subscription.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResubscribe = async () => {
+    if (!userData?.email) return;
+
+    try {
+      setLoading(true);
+
+      const res = await fetch('https://bk52t3yk2l.execute-api.eu-north-1.amazonaws.com/default/resubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userData.email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Subscription resumed.");
+        const updatedUser = { ...userData, subscribed: true };
+        setUserData(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      } else {
+        alert(data.message || "Failed to resubscribe.");
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/');
+  };
+
 
   if (!userData) return <p>Loading user data...</p>;
 
@@ -153,11 +216,11 @@ const Dashboard = () => {
             value={editCity}
             onChange={(e) => setEditCity(e.target.value)}
           />
-        <input
-  type="time"
-  value={editTime}
-  onChange={(e) => setEditTime(e.target.value)}
-/>
+          <input
+            type="time"
+            value={editTime}
+            onChange={(e) => setEditTime(e.target.value)}
+          />
 
           <button onClick={handleUpdateDetails} disabled={savingDetails}>
             {savingDetails ? "⏳ Saving..." : "💾 Save Details"}
