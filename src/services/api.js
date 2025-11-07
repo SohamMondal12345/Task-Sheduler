@@ -1,9 +1,9 @@
-const SIGNUP_API = "https://apob3f04x3.execute-api.eu-north-1.amazonaws.com/default/signup";
-const LOGIN_API = "https://f5bta9zddi.execute-api.eu-north-1.amazonaws.com/default/login";
-const UNSUBSCRIBE_API = "https://7djm4y4zia.execute-api.eu-north-1.amazonaws.com/default/unsubscribe";
-const SAVE_SUB_API = "https://7ovvcfmbq7.execute-api.eu-north-1.amazonaws.com/default/save-subscription";
+const SIGNUP_API = "https://<your-signup-api-endpoint>";
+const LOGIN_API = "https://<your-login-api-endpoint>";
+const UNSUBSCRIBE_API = "https://<your-unsubscribe-api-endpoint>";
+const SAVE_SUB_API = "https://<your-save-subscription-api-endpoint>";
 const WEATHER_API = "https://api.weatherapi.com/v1/current.json";
-const API_KEY = "7aacc04ea876416f8d7170130250108"; // Your key
+const API_KEY = "<your-weather-api-key>";
 
 export async function signup(data) {
   const res = await fetch(SIGNUP_API, {
